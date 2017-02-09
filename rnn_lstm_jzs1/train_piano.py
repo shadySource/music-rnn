@@ -28,35 +28,36 @@ print "\n... Set Constant Values ..."
 
 # ================================================================================
 #
-# 한 번에 모든 midi files 을 이용하여 train 하고 싶을 경우 다음의 경로 사용.
+# when you wanna train model with all midi files at once
 #
 
 # DIR_DATA_SRCs = ["/data/JSB Chorales", "/data/MuseData", "/data/Nottingham", "/data/Piano-midi.de"]
 # DIR_TTV = ["/test", "/train", "/valid"]
 
 # examples 1
-# JSB chorales 의 train data 로만 training 하고 싶을 경우 - 다음 주석을 풀어줄 것
+# when u want to use "JSB Chorales/train" data for training - uncomment next 2 lines
 # path_train = os.getcwd() + DIR_DATA_SRCs[0] + DIR_TTV[1]
 # path_test = os.getcwd() + DIR_DATA_SRCs[0] + DIR_TTV[0]
 
 # examples 2
-# /data/MuseData/ 폴더의 bach midi files 로만 train
+# when use only bach`s midi files in /data/MuseData/
 # target_str = "bach"
 # path_train = os.getcwd() + DIR_DATA_SRCs[1] + DIR_TTV[1]
 # path_test = os.getcwd() + DIR_DATA_SRCs[1] + DIR_TTV[0]
 
 # examples 3
-# /data/Nottingham/ 폴더 midi files 로만 train
+# when use midi files in /data/Nottingham/
 # path_train = os.getcwd() + DIR_DATA_SRCs[2] + DIR_TTV[1]
 # path_test = os.getcwd() + DIR_DATA_SRCs[2] + DIR_TTV[0]
 
 
 # ================================================================================
 #
-# 가져올 sample 이 포함된 폴더 이름과 가져올 파일에 포함된 string setting
+# set directory name what is including data files which you wanna use at triaing
+# set string(target_str) what is included in data files which you wanna use at triaing
 #
-target_str = ""                         # 폴더의 모든 파일 할거면 파일 이름에 포함된 string 적지 말 것
-TARGET_FOLDER = "waltzes"               # training 할 파일이 들어있는 폴더 이름
+target_str = ""                         # if u use all files at certain directory, don`t set any letters
+TARGET_FOLDER = "waltzes"               # directory name which is containing data files for training
 path_train = "./data_for_train/" + TARGET_FOLDER
 
 # init paths of Waltzes
@@ -72,17 +73,16 @@ filename_result_predict = DIR_RESULTS + 'rnn_lstm_predict_{0}.txt'.format(dateti
 
 ##
 #
-# 폴더 없으면 생성하기
+# If there are not existing directories, make directories using command "mkdir"
 #
 
-# train 결과 weights file 저장할 폴더가 없으면 새로 생성
+# directory to save weights file while training is done
 if not os.path.exists(DIR_WEIGHTS):
     print "\n...... Make Folder ...... : ", DIR_WEIGHTS
     os.mkdir(DIR_WEIGHTS)
 if not os.path.exists(DIR_RESULTS):
     print "\n...... Make Folder ...... : ", DIR_RESULTS
     os.mkdir(DIR_RESULTS)
-    # 폴더 없으면 생성
 if not os.path.exists(DIR_PREDICTED_MIDI):
     print "\n...... Make Folder ......", DIR_PREDICTED_MIDI
     os.mkdir(DIR_PREDICTED_MIDI)
@@ -91,34 +91,34 @@ if not os.path.exists(DIR_PREDICTED_MIDI):
 
 ##
 #
-# data set 설정하기 (가져오기)
+# set Data Set (load Data Set)
 #
-
-# target_str : 가져오고자 하는 파일에 포함된 string 정보, 위에서 define constant values 구간에서 설정할 것
+# target_str : string info what is included at files u want to load for training
+#              set this variable at block "define constant values"
 #              example : target_str = "reels"
 
 print "\n...... Get X, Y, samples_length, seq_length, hidden_size ...... : \n"
 print "\tfrom {0},".format(path_train)
 print "\ttarget_string : {0}\n".format(target_str)
 
-MidiUtil = Midi_Util()                              # Midi_Util 사용하기
+MidiUtil = Midi_Util()                              # use Midi_Util
 
-# 경로 내의 모든 파일을 가져오고 싶은 경우
+# if u want to load all files at path_train
 # X, Y, samples_length, seq_length, hidden_size = MidiUtil.get_data_set_from_midi(path_train)
 
-# target_str 을 포함한 파일만 가져오고 싶은 경우
+# if u want to load filese which is including target_str
 X, Y, samples_length, seq_length, hidden_size = MidiUtil.get_data_set_from_midi(path_train, target_str)
 
 
 
 ##
 #
-# model build 하기 : Sequential Model()
+# Build Model : Sequential Model()
 #
 print "\n...... Start Making Model ......"
 
 #
-# model 1 : LSTM
+# Model 1 : LSTM (Long Short Term Memory)
 #
 model = Sequential()
 
@@ -132,7 +132,7 @@ model.add(Activation('softmax'))                    # softmax layer
 
 
 # #
-# # model 2 : JZS1
+# # Model 2 : JZS1
 # #
 # model = Sequential()
 #
@@ -153,10 +153,10 @@ ModelUtil.layer_info(model)
 
 ##
 #
-# weigts 값이 있다면 로드해올 것
+# if there is weigts, load weights
 #
 
-# 자동 : 가장 최근의 마지막 wts 가져오기
+# load automatically : load weights which is containing the latest weights infomation
 try:
     wts_list = os.listdir(DIR_WEIGHTS)
     if len(wts_list) != 0:
@@ -166,7 +166,8 @@ try:
 except:
     pass
 
-# # 수동 : 가져올 wts 파일을 파일이름으로 지정해주기
+# # load passively
+# #
 # # waltzes wts file ==> loss: 1.5240 - acc: 0.3573
 # # ./wts_Waltzes/train_piano_wts_seq_model_2015.11.11.23:52:29.wts
 # filename_wts = "train_piano_wts_seq_model_2015.11.11.23:52:29.wts"
@@ -190,7 +191,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam')
 
 ##
 #
-# predict 용 sample 함수들
+# functions for sampling predict data
 #
 def sample(prob, temperature=1.0):
     # helper function to sample an index from a probability array
@@ -209,7 +210,7 @@ def sample2(prob, temperature=1.0):
 # by mansour
 def choose_note_index(prob, temperature=1.0, max_chords=4):
     # helper function to sample notes from a probability array
-    # 최대 화음은 일단 4개까지로 한정함.
+    # maximum chords are limited 4 notes
     prob = np.log(prob) / temperature
     prob = np.exp(prob) / np.sum(np.exp(prob))
     notes = np.random.choice(prob.shape[0], max_chords, p=prob)
@@ -224,29 +225,29 @@ def sample_song(seed, midi_file_path):
     X_predict[0, 0, :] = seed  # save seed
 
     for i in range(seq_length):
-        # 예측.
+        # predict
         phat = model.predict(X_predict)
-        # note 선택.
+        # choice note
         ix = choose_note_index(phat[0, i])
-        # end of sequence 가 있으면 종료.
+        # break if end of sequence (EOS) is found
         if np.any(ix == 128):
             break
-        # 출력값에 저장.
+        # save at predict variable
         if i < seq_length - 1:
             X_predict[0, i + 1, ix] = 1
 
-    # EOS 이전까지로 짤라줌.
+    # cut out EOS
     total_beats = (X_predict.sum(axis=-1) > 0).sum()
     X_result = X_predict[0, :total_beats]
 
-    # 미디 파일로 저장.
+    # save predicted data with midi format
     MidiUtil.save_midi(midi_file_path, X_result)
 
 
 
 ##
 #
-# batch size 및 epoch 값 설정
+# set batch size, epoch values
 #
 # ================================================================================
 training_times = 1000
@@ -271,7 +272,7 @@ with open(filename_result_predict, 'a') as file :
         time_start_epochs = datetime.now()
 
         #
-        # train 구간 시작
+        # train : start
         #
 
         # model.fit(X, Y, batch_size=batch_size_num, nb_epoch=epoch_num, show_accuracy=True, shuffle=False)
@@ -286,28 +287,28 @@ with open(filename_result_predict, 'a') as file :
         print "\n\tSaved Weights File : {0}".format(filename_wts)
 
         #
-        # predict 구간 시작
+        # predict : start
         #
 
         time_start_predict = datetime.now()
-        # iteration 이 10 번 돌 때만 predict 하자
+        # do prediction at every 10th iteration
         if iteration % 10 == 0:
             # # for diversity in [0.2, 0.5, 1.0, 1.2]:
 
-            # 트레이닝 세트에서 첫번째 음표 추출
+            # get first note at training set
             row = np.random.randint(0, samples_length, 1)
             seed = X[row, X[0].sum(axis=-1) > 0, :][0, :]
 
-            # 추출한 데이터로 샘플송 제작해서 midi 파일로 저장
+            # with above note, make the sample song and save this song with midi format
             FILE_PRED_MIDI = DIR_PREDICTED_MIDI + "rnn_lstm_pred_midi_{0}.mid".format(datetime.now().strftime("%Y.%m.%d.%H:%M:%S"))
             sample_song(seed, FILE_PRED_MIDI)
 
-            # debug용
+            # debug
             time_end_predict = datetime.now()
             print "\n\tPredict time : {0}".format(time_end_predict - time_start_predict)
 
         #
-        # predict 구간 끝
+        # predict : end
         #
 
         time_end_iteration = datetime.now()
@@ -316,7 +317,7 @@ with open(filename_result_predict, 'a') as file :
         time_passed_total = datetime.now() - time_start_total
         print "\n\tPassed time from starting Training Process : {0}".format(time_passed_total)
 
-        # log 저장
+        # save log
         # save_str =""
         # file.write(save_str)
 ##
