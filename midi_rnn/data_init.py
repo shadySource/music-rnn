@@ -27,7 +27,7 @@ class Midi_Util(object):
         # criterion to apply indexing to samples
         # after converting midi files, tick_step is changed with Quater note
         # tick_step = mf.ticksPerQuarterNote / 2            # formula to calculate tick_setp
-        # although tick_step is initialized with 512, actually this is re-initialized when program loads midi files
+        # although tick_step is initialized with 512, it is re-initialized when program loads midi files
         self.tick_step = 512
 
         self.samples_num = 0                                # samples number, will initialized
@@ -52,7 +52,7 @@ class Midi_Util(object):
         self.seq_length = self.get_data_set_max_seq_length(path_data, samples_list)
 
         # for debug
-        print "\tdebug --------> self.seq_length : {0}\n\n".format(self.seq_length)
+        print("\tdebug --------> self.seq_length : {0}\n\n".format(self.seq_length))
 
         # init data_set
         X_train = np.zeros((self.samples_num, self.seq_length, self.hidden_size), dtype=int)
@@ -98,7 +98,7 @@ class Midi_Util(object):
         """
         # for debug
         whatislongestfile = ""
-        print "\n...... get info : longest sequence length ......"
+        print ("\n...... get info : longest sequence length ......")
         max_ks_time = 0
         mfticksperquarternote = 0
         for filename in samples_list:
@@ -113,7 +113,7 @@ class Midi_Util(object):
         tick_step = mfticksperquarternote / 2             # tick step is 8th note, quaver
         longest_seq_length = max_ks_time / tick_step + 1  # add 1 index for EOS
 
-        print "\n\tLongest File name : {0}, sequence length : {1}\n\n".format(whatislongestfile, longest_seq_length)
+        print ("\n\tLongest File name : {0}, sequence length : {1}\n\n".format(whatislongestfile, longest_seq_length))
         return longest_seq_length
 
 
@@ -126,7 +126,7 @@ class Midi_Util(object):
         :param target_str: string which is included target files
         :return: midi files number, file names list
         """
-        print "\n...... get samples list ......"
+        print ("\n...... get samples list ......")
         # file list at path
         samples_list = os.listdir(path_data)
 
@@ -143,7 +143,7 @@ class Midi_Util(object):
         # init sample number
         self.samples_num = len(samples_list)
 
-        print "\n\tReturn {0} file name list.".format(len(samples_list))
+        print( "\n\tReturn {0} file name list.".format(len(samples_list)))
         return len(samples_list), samples_list
 
 
@@ -230,14 +230,13 @@ class Midi_Util(object):
         # add EOS at end of sequence, EOS is case that data_dim[-1] = 1
         one_X_train[-1, self.note_dim] = 1
 
-        print '\tMidi file(=%s) successfully loaded. Total 1/8 beats = %d' % (path_midifile, total_beat)
-
+        print ('\tMidi file(=%s) successfully loaded. Total 1/8 beats = %d' % (path_midifile, total_beat))
         return one_X_train
 
 
     # do not use in this traing model, just reserve function
     def get_ix2note(self):
-        print "\n...... get matrix of index to note number ......"
+        print ("\n...... get matrix of index to note number ......")
         ix2note = []
         # max_note_num + 1(108) + 1(EOS)
         # for note in range(self.min_note_num, self.max_note_num + 1 + 1, 1):
@@ -283,6 +282,6 @@ class Midi_Util(object):
         mf.write()
         mf.close()
 
-        print '\tMidi file(=%s) successfully saved. Total 1/8 beats = %d' % (midi_file_path, onehot_mat.shape[0])
+        print ('\tMidi file(=%s) successfully saved. Total 1/8 beats = %d' % (midi_file_path, onehot_mat.shape[0]))
 
 ##
